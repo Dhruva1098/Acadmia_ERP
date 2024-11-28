@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import StudentList from './StudentList';
 import StudentForm from './StudentForm';
 import Navbar from './Navbar';
+import Login from './components/Login';
 
 function App() {
   const [students, setStudents] = useState([]);
@@ -11,14 +12,34 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchDomains();
-      await fetchStudents();
-    };
-    fetchData();
+    // Check if user is already authenticated
+    checkAuthStatus();
   }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/status', {
+        credentials: 'include'
+      });
+      setIsAuthenticated(response.ok);
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setIsAuthenticated(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchData = async () => {
+        await fetchDomains();
+        await fetchStudents();
+      };
+      fetchData();
+    }
+  }, [isAuthenticated]);
 
   const fetchStudents = async () => {
     try {
@@ -60,44 +81,68 @@ function App() {
     return nameMatch;
   });
 
+  const handleLogin = (authData) => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('http://localhost:8080/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <div>
       <Navbar 
         onSearch={setSearchTerm}
+        onLogout={handleLogout}
+        isAuthenticated={isAuthenticated}
       />
-      <div className="container mt-4">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h1>Student Management System</h1>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => setShowForm(!showForm)}
-          > 
-            {showForm ? 'Hide Form' : 'Add New Student'}
-          </button>
-        </div>
-        
-        {showForm && (
-          <div className="mb-4">
-            <StudentForm 
-              domains={domains} 
-              onStudentAdded={handleStudentAdded}
-            />
+      <div className="main-content">
+        <div className="container mt-4">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h1>Student Management System</h1>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => setShowForm(!showForm)}
+            > 
+              {showForm ? 'Hide Form' : 'Add New Student'}
+            </button>
           </div>
-        )}
-
-        {loading ? (
-          <div className="text-center">
-            <div className="spinner-border" role="status">
-              <span className="visually-hidden">Loading...</span>
+          
+          {showForm && (
+            <div className="mb-4">
+              <StudentForm 
+                domains={domains} 
+                onStudentAdded={handleStudentAdded}
+              />
             </div>
-          </div>
-        ) : (
-          <StudentList 
-            students={filteredStudents} 
-            domains={domains} 
-            onDelete={handleDelete}
-          />
-        )}
+          )}
+
+          {loading ? (
+            <div className="text-center">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          ) : (
+            <StudentList 
+              students={filteredStudents} 
+              domains={domains} 
+              onDelete={handleDelete}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
