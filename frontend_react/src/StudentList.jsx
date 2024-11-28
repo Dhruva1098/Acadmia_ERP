@@ -1,47 +1,61 @@
-const StudentList = ({ students, setStudents }) => {
-  const handleDelete = (id) => {
-    fetch(`http://localhost:8080/api/students/${id}`, { method: "DELETE" })
-      .then(() => {
-        // Update student list after deletion
-        setStudents((prev) => prev.filter((student) => student.id !== id));
-      })
-      .catch((error) => console.error("Error deleting student:", error));
+import React from 'react';
+import { Table } from 'react-bootstrap';
+import { FaTrash } from 'react-icons/fa';
+
+function StudentList({ students, domains, onDelete }) {
+  const getDomainName = (student) => {
+    const domain = domains.find(domain => 
+      domain.students.some(s => s.id === student.id)
+    );
+    return domain ? domain.program : 'Not Assigned';
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/students/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        onDelete(id);
+      } else {
+        console.error('Failed to delete student');
+      }
+    } catch (error) {
+      console.error('Error deleting student:', error);
+    }
   };
 
   return (
     <div>
-      <h2 className="my-3">Student List</h2>
-      <table className="table table-striped">
+      <Table striped bordered hover responsive>
         <thead>
           <tr>
-            <th>#</th>
             <th>Student ID</th>
             <th>Name</th>
             <th>Email</th>
-            <th>Phone no.</th>
+            <th>Phone</th>
             <th>Address</th>
-            <th>Domain</th>
             <th>Gender</th>
+            <th>Program</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {students.map((student, index) => (
+          {students.map((student) => (
             <tr key={student.id}>
-              <td>{index + 1}</td>
               <td>{student.studentId}</td>
-              <td>
-                {student.firstName} {student.lastName}
-              </td>
+              <td>{`${student.firstName} ${student.lastName}`}</td>
               <td>{student.email}</td>
               <td>{student.phone}</td>
               <td>{student.address}</td>
-              <td>{student.domain}</td>
               <td>{student.gender}</td>
+              <td>{getDomainName(student)}</td>
               <td>
                 <button
-                  className="btn btn-danger btn-sm"
                   onClick={() => handleDelete(student.id)}
+                  className="btn btn-danger btn-sm"
+                  title="Delete student"
                 >
                   Delete
                 </button>
@@ -49,9 +63,14 @@ const StudentList = ({ students, setStudents }) => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
+      {students.length === 0 && (
+        <div className="text-center mt-4">
+          <p>No students found</p>
+        </div>
+      )}
     </div>
   );
-};
+}
 
-export default StudentList;
+export default StudentList; 

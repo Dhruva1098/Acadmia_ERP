@@ -28,11 +28,26 @@ public class Student {
     @JsonBackReference // Prevent serialization of the 'Domain' object in this side
     private Domain domain;
 
+    @PrePersist
     @PostPersist
     public void generateStudentId() {
-        String prefix = domain.getProgram(); // Use the `program` field in `Domain` for the prefix
+        String programCode = extractProgramCode(domain.getProgram()); // Extract concise program code
         String year = String.valueOf(Year.now().getValue());
-        String end = String.format("%03d", id);
-        this.studentId = prefix + year + end;
+        String end = String.format("%03d", id); // Format ID with leading zeroes
+        this.studentId = programCode + year + end;
+    }
+
+    private String extractProgramCode(String program) {
+        // Custom logic to convert program names to codes
+        switch (program.toLowerCase()) {
+            case "mtech cse", "mtech ece":
+                return "MT";
+            case "imtech cse", "imtech ece":
+                return "IMT";
+            case "ms cse", "ms ece":
+                return "MS";
+            default:
+                return "UNK"; // Fallback for unknown programs
+        }
     }
 }
