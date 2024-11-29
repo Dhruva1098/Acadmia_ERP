@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import { FaTrash } from 'react-icons/fa';
+import { authenticatedFetch } from './utils/api';
 
 function StudentList({ students, domains, onDelete }) {
   const getDomainName = (student) => {
@@ -15,8 +16,8 @@ function StudentList({ students, domains, onDelete }) {
     
     if (isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:8080/api/students/${student.id}`, {
-          method: 'DELETE',
+        const response = await authenticatedFetch(`http://localhost:8080/api/students/${student.id}`, {
+          method: 'DELETE'
         });
         
         if (response.ok) {

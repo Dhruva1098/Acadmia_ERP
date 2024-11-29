@@ -18,27 +18,25 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-        credentials: 'include'
-      });
+        const response = await fetch('http://localhost:8080/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(credentials)
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        onLogin(data);
-      } else {
-        setError('Invalid username or password');
-      }
-    } catch (err) {
-      setError('An error occurred during login');
-      console.error('Login error:', err);
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.token);
+            onLogin(data);
+        } else {
+            setError('Invalid credentials');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        setError('An error occurred during login');
     }
   };
 

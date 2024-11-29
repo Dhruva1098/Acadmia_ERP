@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { authenticatedFetch } from './utils/api';
 
 const StudentForm = ({ onStudentAdded, domains }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+
     phone: '',
     address: '',
     photographUrl: '',
@@ -32,18 +34,14 @@ const StudentForm = ({ onStudentAdded, domains }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/students', {
+      const response = await authenticatedFetch('http://localhost:8080/api/students', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(studentToAdd),
+        body: JSON.stringify(studentToAdd)
       });
 
       if (response.ok) {
         const newStudent = await response.json();
         onStudentAdded(newStudent);
-        // Reset form
         setFormData({
           firstName: '',
           lastName: '',
@@ -52,15 +50,11 @@ const StudentForm = ({ onStudentAdded, domains }) => {
           address: '',
           photographUrl: '',
           domainId: '',
-          gender: '',
+          gender: ''
         });
-        alert('Student added successfully!');
-      } else {
-        alert('Failed to add student');
       }
     } catch (error) {
       console.error('Error adding student:', error);
-      alert('Error adding student');
     }
   };
 

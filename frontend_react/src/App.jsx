@@ -6,6 +6,7 @@ import StudentForm from './StudentForm';
 import Navbar from './Navbar';
 import Login from './components/Login';
 import Footer from './Footer';
+import { authenticatedFetch } from './utils/api';
 
 function App() {
   const [students, setStudents] = useState([]);
@@ -21,14 +22,29 @@ function App() {
   }, []);
 
   const checkAuthStatus = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        setIsAuthenticated(false);
+        return;
+    }
+
     try {
-      const response = await fetch('http://localhost:8080/api/auth/status', {
-        credentials: 'include'
-      });
-      setIsAuthenticated(response.ok);
+        const response = await fetch('http://localhost:8080/api/auth/status', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!response.ok) {
+            // Token expired or invalid
+            localStorage.removeItem('token');
+            setIsAuthenticated(false);
+        } else {
+            setIsAuthenticated(true);
+        }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      setIsAuthenticated(false);
+        console.error('Auth check failed:', error);
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
     }
   };
 
@@ -44,23 +60,27 @@ function App() {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/students');
-      const data = await response.json();
-      setStudents(data);
-      setLoading(false);
+        const response = await authenticatedFetch('http://localhost:8080/api/students');
+        if (response.ok) {
+            const data = await response.json();
+            setStudents(data);
+        }
+        setLoading(false);
     } catch (error) {
-      console.error('Error fetching students:', error);
-      setLoading(false);
+        console.error('Error fetching students:', error);
+        setLoading(false);
     }
   };
 
   const fetchDomains = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/domain');
-      const data = await response.json();
-      setDomains(data);
+        const response = await authenticatedFetch('http://localhost:8080/api/domain');
+        if (response.ok) {
+            const data = await response.json();
+            setDomains(data);
+        }
     } catch (error) {
-      console.error('Error fetching domains:', error);
+        console.error('Error fetching domains:', error);
     }
   };
 
@@ -86,17 +106,28 @@ function App() {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch('http://localhost:8080/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
   };
+
+  // Add periodic token check
+  useEffect(() => {
+    if (isAuthenticated) {
+        const interval = setInterval(checkAuthStatus, 10000); // Check every 10 seconds
+        return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    const handleTokenExpired = () => {
+        localStorage.removeItem('token');
+        setIsAuthenticated(false);
+    };
+
+    window.addEventListener('tokenExpired', handleTokenExpired);
+    return () => window.removeEventListener('tokenExpired', handleTokenExpired);
+  }, []);
 
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />;
