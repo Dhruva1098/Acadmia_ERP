@@ -5,6 +5,7 @@ import StudentList from './StudentList';
 import StudentForm from './StudentForm';
 import Navbar from './Navbar';
 import Login from './components/Login';
+import Footer from './Footer';
 
 function App() {
   const [students, setStudents] = useState([]);
@@ -109,12 +110,13 @@ function App() {
         isAuthenticated={isAuthenticated}
       />
       <div className="main-content">
-        <div className="container mt-4">
+        <div className="container">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h1>Student Management System</h1>
             <button 
               className="btn btn-primary" 
               onClick={() => setShowForm(!showForm)}
+              style={{ fontSize: '0.9rem', padding: '8px 16px' }}
             > 
               {showForm ? 'Hide Form' : 'Add New Student'}
             </button>
@@ -144,6 +146,7 @@ function App() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

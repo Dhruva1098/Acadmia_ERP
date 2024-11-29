@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DomainRepository extends JpaRepository<Domain, Long> {
-    boolean existsByProgram(String program);
 }

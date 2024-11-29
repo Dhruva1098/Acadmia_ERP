@@ -28,17 +28,17 @@ function StudentList({ students, domains, onDelete }) {
 
   return (
     <div>
-      <Table striped bordered hover responsive>
+      <Table hover responsive className="shadow-sm">
         <thead>
           <tr>
-            <th>Student ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Address</th>
-            <th>Gender</th>
-            <th>Program</th>
-            <th>Actions</th>
+            <th style={{width: '120px'}}>Student ID</th>
+            <th style={{width: '180px'}}>Name</th>
+            <th style={{width: '200px'}}>Email</th>
+            <th style={{width: '130px'}}>Phone</th>
+            <th style={{width: '200px'}}>Address</th>
+            <th style={{width: '100px'}}>Gender</th>
+            <th style={{width: '150px'}}>Program</th>
+            <th style={{width: '100px'}}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -54,8 +54,12 @@ function StudentList({ students, domains, onDelete }) {
               <td>
                 <button
                   onClick={() => handleDelete(student.id)}
-                  className="btn btn-danger btn-sm"
+                  className="btn btn-sm"
                   title="Delete student"
+                  style={{
+                    backgroundColor: '#EDA398',
+                    color: '#282828'
+                  }}
                 >
                   Delete
                 </button>

@@ -6,6 +6,7 @@ import com.dhruva.student.repository.StudentRepository;
 import com.dhruva.student.repository.DomainRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,19 +30,33 @@ public class StudentService {
     }
 
     public Student addStudent(Student newStudent) {
-        // Fetch the domain by ID
-        Long domainId = newStudent.getDomain().getId();
-        Optional<Domain> domainOptional = domainRepository.findById(domainId);
-
-        if (domainOptional.isPresent()) {
-            Domain domain = domainOptional.get();
-            newStudent.setDomain(domain); // Set the correct domain
-
-            // Save the student, automatically generating studentId
-            return studentRepository.save(newStudent);
-        } else {
-            throw new RuntimeException("Domain with ID " + domainId + " not found.");
+        if (newStudent.getDomain() == null || newStudent.getDomain().getId() == null) {
+            throw new RuntimeException("Domain information is required");
         }
+        Optional<Domain> domainOptional = domainRepository.findById(newStudent.getDomain().getId());
+        if (!domainOptional.isPresent()) {
+            throw new RuntimeException("Domain not found");
+        }
+        Domain domain = domainOptional.get();
+        newStudent.setDomain(domain);
+        Student savedStudent = studentRepository.save(newStudent);
+
+        String programCode = extractProgramCode(domain.getProgram());
+        String year = String.valueOf(Year.now().getValue());
+        String end = String.format("%03d", savedStudent.getId());
+        savedStudent.setStudentId(programCode + year + end);
+        // Save again with the generated student ID
+        return studentRepository.save(savedStudent);
+    }
+
+    private String extractProgramCode(String program) {
+        if (program == null) return "UNK";
+        return switch (program.toLowerCase()) {
+            case "mtech cse", "mtech ece" -> "MT";
+            case "imtech cse", "imtech ece" -> "IMT";
+            case "ms cse", "ms ece" -> "MS";
+            default -> "UNK";
+        };
     }
 
     public void deleteStudentById(Long id) {

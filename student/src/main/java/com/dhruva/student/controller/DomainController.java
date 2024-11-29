@@ -39,7 +39,7 @@ public class DomainController {
         // Fetch domain by ID
         Domain domain = domainService.getDomainById(student.getDomain().getId());
         if (domain != null) {
-            student.setDomain(domain); // Set the domain to the student
+            student.setDomain(domain);
         } else {
             throw new RuntimeException("Domain not found");
         }

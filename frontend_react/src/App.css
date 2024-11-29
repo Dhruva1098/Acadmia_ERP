@@ -1,28 +1,62 @@
 #root {
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  text-align: left;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
 }
 
 body {
-  background-color: #f8f9fa;
+  background-color: #EAE6E0;
 }
 
 .main-content {
-  padding-top: 80px;
-  min-height: 100vh;
+  padding-top: 90px;
+  min-height: calc(100vh - 60px);
 }
 
 .table {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  background: #F9F6EF;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(40, 40, 40, 0.05);
+  width: 100%;
+  margin: 20px 0;
 }
 
 .table thead th {
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #dee2e6;
+  background-color: #282828;
+  color: #F9F6EF;
+  font-weight: 500;
+  padding: 16px;
+  border-bottom: 1px solid #EDA398;
+}
+
+.table tbody td {
+  padding: 16px;
+  color: #282828;
+}
+
+.btn-primary {
+  background-color: #193497;
+  border: none;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+  width: auto;
+  font-size: 0.9rem;
+}
+
+.btn-primary:hover {
+  background-color: #EDA398;
+}
+
+.footer {
+  background-color: #282828;
+  color: #F9F6EF;
+  text-align: center;
+  padding: 1rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 0.9rem;
 }
 
 .form-control:focus {

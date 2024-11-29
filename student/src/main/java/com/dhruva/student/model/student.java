@@ -31,23 +31,21 @@ public class Student {
     @PrePersist
     @PostPersist
     public void generateStudentId() {
-        String programCode = extractProgramCode(domain.getProgram()); // Extract concise program code
-        String year = String.valueOf(Year.now().getValue());
-        String end = String.format("%03d", id); // Format ID with leading zeroes
-        this.studentId = programCode + year + end;
+        if (domain != null && id != null) {
+            String programCode = extractProgramCode(domain.getProgram());
+            String year = String.valueOf(Year.now().getValue());
+            String end = String.format("%03d", id);
+            this.studentId = programCode + year + end;
+        }
     }
 
     private String extractProgramCode(String program) {
         // Custom logic to convert program names to codes
-        switch (program.toLowerCase()) {
-            case "mtech cse", "mtech ece":
-                return "MT";
-            case "imtech cse", "imtech ece":
-                return "IMT";
-            case "ms cse", "ms ece":
-                return "MS";
-            default:
-                return "UNK"; // Fallback for unknown programs
-        }
+        return switch (program.toLowerCase()) {
+            case "mtech cse", "mtech ece" -> "MT";
+            case "imtech cse", "imtech ece" -> "IMT";
+            case "ms cse", "ms ece" -> "MS";
+            default -> "UNK"; // Fallback for unknown programs
+        };
     }
 }
