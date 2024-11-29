@@ -10,19 +10,23 @@ function StudentList({ students, domains, onDelete }) {
     return domain ? domain.program : 'Not Assigned';
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/students/${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (response.ok) {
-        onDelete(id);
-      } else {
-        console.error('Failed to delete student');
+  const handleDelete = async (student) => {
+    const isConfirmed = window.confirm(`Are you sure you want to delete ${student.firstName} ${student.lastName} from the database?`);
+    
+    if (isConfirmed) {
+      try {
+        const response = await fetch(`http://localhost:8080/api/students/${student.id}`, {
+          method: 'DELETE',
+        });
+        
+        if (response.ok) {
+          onDelete(student.id);
+        } else {
+          console.error('Failed to delete student');
+        }
+      } catch (error) {
+        console.error('Error deleting student:', error);
       }
-    } catch (error) {
-      console.error('Error deleting student:', error);
     }
   };
 
@@ -53,7 +57,7 @@ function StudentList({ students, domains, onDelete }) {
               <td>{getDomainName(student)}</td>
               <td>
                 <button
-                  onClick={() => handleDelete(student.id)}
+                  onClick={() => handleDelete(student)}
                   className="btn btn-sm"
                   title="Delete student"
                   style={{
