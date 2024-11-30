@@ -25,7 +25,7 @@ public class Student {
 
     @ManyToOne
     @JoinColumn(name = "domain_id", nullable = false)
-    @JsonBackReference // Prevent serialization of the 'Domain' object in this side
+    @JsonBackReference
     private Domain domain;
 
     @PrePersist

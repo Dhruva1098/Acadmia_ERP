@@ -12,7 +12,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long validityInMilliseconds = 3000000;
+    private final long validityInMilliseconds = 240000;
 
     public String generateToken(String username) {
         Date now = new Date();
